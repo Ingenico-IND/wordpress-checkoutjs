@@ -1,17 +1,17 @@
 <?php
 
-require_once('ingenico.php');
+require_once('worldline.php');
 
 add_action('admin_menu', 'menupage');
 
 function menupage()
 {
-	add_menu_page('Page Title', 'Ingenico Offline verification ', 'manage_options', 'ingenico-offline', 'O_call_req', ' dashicons-money-alt ');
+	add_menu_page('Page Title', 'Worldline Offline verification ', 'manage_options', 'worldline-offline', 'O_call_req', ' dashicons-money-alt ');
 }
 
 function O_call_req()
 {
-	$paynimo_class  = new WC_Ingenico();
+	$paynimo_class  = new WC_worldline();
 ?>
 	<!DOCTYPE html>
 	<html lang="en">
@@ -53,7 +53,7 @@ function O_call_req()
 	<?php
 	$merchantTxnRefNumber = null;
 	$date = null;
-	$merchant_code = $paynimo_class->ingenico_merchant_code;
+	$merchant_code = $paynimo_class->worldline_merchant_code;
 	if (isset($_POST["token"])) {
 		$merchantTxnRefNumber = $_POST["token"];
 	}

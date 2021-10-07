@@ -1,12 +1,11 @@
 <?php
 /*
-Plugin Name: Ingenico
+Plugin Name: Worldline
 Plugin URI: 
-Description: Ingenico ePayments (a Worldline brand) is India's leading digital payment solutions company. Being a company with more than 45 years of global payment experience, we are present in India for over 20 years and are powering over 550,000 businesses with our tailored payment solution.
+Description: Worldline ePayments is India's leading digital payment solutions company. Being a company with more than 45 years of global payment experience, we are present in India for over 20 years and are powering over 550,000 businesses with our tailored payment solution.
 Version: 1.0 
-Author: Jai Girkar
-Author URI: 
-
+Author: Wordldline
+Author URI: https://www.worldline.com
 Copyright: 
 License: 
 License URI: 
@@ -26,16 +25,16 @@ add_action('rest_api_init', 'my_S2S_route');
 function woocommerce_paynimo_init()
 {
 	if (!class_exists('WC_Payment_Gateway')) return;
-	class WC_Ingenico extends WC_Payment_Gateway
+	class WC_worldline extends WC_Payment_Gateway
 	{
 
 		public function __construct()
 		{
 			global $woocommerce;
-			$this->id           = 'ingenico';
-			$this->method_title = __('Ingenico', 'ingenico');
-			$this->method_description = __("Ingenico ePayments (a Worldline brand) is India's leading digital payment solutions company. Being a company with more than 45 years of global payment experience, we are present in India for over 20 years and are powering over 550,000 businesses with our tailored payment solution.", 'ingenico');
-			$this->icon         =  plugins_url('images/logo_branding_white.png', __FILE__);
+			$this->id           = 'worldline';
+			$this->method_title = __('Worldline', 'worldline');
+			$this->method_description = __("Worldline ePayments is India's leading digital payment solutions company. Being a company with more than 45 years of global payment experience, we are present in India for over 20 years and are powering over 550,000 businesses with our tailored payment solution.", 'worldline');
+			$this->icon         =  plugins_url('images/worldline-mint-checkout.png', __FILE__);
 			$this->has_fields   = true;
 			$this->supports = array(
 				'products',
@@ -46,19 +45,19 @@ function woocommerce_paynimo_init()
 			$this->currency_type  = get_woocommerce_currency();
 			$this->title = (isset($this->settings['title'])) ? $this->settings['title'] : null;
 			$this->description  = (isset($this->settings['description'])) ? $this->settings['description'] : null;
-			$this->ingenico_merchant_code      = (isset($this->settings['ingenico_merchant_code'])) ? $this->settings['ingenico_merchant_code'] : null;
-			$this->ingenico_SALT      = (isset($this->settings['ingenico_SALT'])) ? $this->settings['ingenico_SALT'] : null;
+			$this->worldline_merchant_code      = (isset($this->settings['worldline_merchant_code'])) ? $this->settings['worldline_merchant_code'] : null;
+			$this->worldline_SALT      = (isset($this->settings['worldline_SALT'])) ? $this->settings['worldline_SALT'] : null;
 			$this->webservice_locator  = (isset($this->settings['webservice_locator'])) ? $this->settings['webservice_locator'] : null;
-			$this->ingenico_merchant_scheme_code   = (isset($this->settings['ingenico_merchant_scheme_code'])) ? $this->settings['ingenico_merchant_scheme_code'] : null;
-			$this->ingenico_decline_msg      = (isset($this->settings['ingenico_decline_msg'])) ? $this->settings['ingenico_decline_msg'] : null;
-			$this->ingenico_success_msg      = (isset($this->settings['ingenico_success_msg'])) ? $this->settings['ingenico_success_msg'] : null;
+			$this->worldline_merchant_scheme_code   = (isset($this->settings['worldline_merchant_scheme_code'])) ? $this->settings['worldline_merchant_scheme_code'] : null;
+			$this->worldline_decline_msg      = (isset($this->settings['worldline_decline_msg'])) ? $this->settings['worldline_decline_msg'] : null;
+			$this->worldline_success_msg      = (isset($this->settings['worldline_success_msg'])) ? $this->settings['worldline_success_msg'] : null;
 			$this->merchant_logo_url      = (isset($this->settings['merchant_logo_url'])) ? $this->settings['merchant_logo_url'] : null;
 			$this->PRIMARY_COLOR_CODE      = (isset($this->settings['PRIMARY_COLOR_CODE'])) ? $this->settings['PRIMARY_COLOR_CODE'] : null;
 			$this->SECONDARY_COLOR_CODE    = (isset($this->settings['SECONDARY_COLOR_CODE'])) ? $this->settings['SECONDARY_COLOR_CODE'] : null;
 			$this->BUTTON_COLOR_CODE_1      = (isset($this->settings['BUTTON_COLOR_CODE_1'])) ? $this->settings['BUTTON_COLOR_CODE_1'] : null;
 			$this->BUTTON_COLOR_CODE_2      = (isset($this->settings['BUTTON_COLOR_CODE_2'])) ? $this->settings['BUTTON_COLOR_CODE_2'] : null;
 			//----------------------------
-			$this->ingenico_payment_mode      = (isset($this->settings['ingenico_payment_mode'])) ? $this->settings['ingenico_payment_mode'] : null;
+			$this->worldline_payment_mode      = (isset($this->settings['worldline_payment_mode'])) ? $this->settings['worldline_payment_mode'] : null;
 			$this->enableNewWindowFlow      = (isset($this->settings['enableNewWindowFlow'])) ? $this->settings['enableNewWindowFlow'] : null;
 			$this->enableExpressPay      	= (isset($this->settings['enableExpressPay'])) ? $this->settings['enableExpressPay'] : null;
 			$this->separateCardMode      	= (isset($this->settings['separateCardMode'])) ? $this->settings['separateCardMode'] : null;
@@ -78,14 +77,17 @@ function woocommerce_paynimo_init()
 			} else {
 				add_action('woocommerce_update_options_payment_gateways', array(&$this, 'process_admin_options'));
 			}
-			$this->notify_url = add_query_arg('wc-api', 'WC_Ingenico', home_url('/'));
+			$this->notify_url = add_query_arg('wc-api', 'WC_worldline', home_url('/'));
 			$this->msg['message'] = "";
 			$this->msg['class']   = "";
 
-			add_action('woocommerce_api_wc_ingenico', array($this, 'check_paynimo_response'));
+			add_action('woocommerce_api_wc_worldline', array($this, 'check_paynimo_response'));
 			add_action('woocommerce_admin_order_data_after_billing_address', array($this, 'display_merchantid_backend'), 10, 1);
-			add_action('woocommerce_receipt_ingenico', array($this, 'receipt_page'));
+			add_action('woocommerce_receipt_worldline', array($this, 'receipt_page'));
 			add_action('init', 'register_session');
+			if (isset($_POST['worldline_cus_cancel'])) {
+				wc_add_notice("Payment cancelled", "error");
+			}
 		}
 
 
@@ -113,41 +115,61 @@ function woocommerce_paynimo_init()
 			}
 		}
 
+		/**
+		 * Generates the order form
+		 **/
+		function generateOrderForm()
+		{
+			$wc_co_url = wc_get_checkout_url();
+			return <<<EOT
+				<form name='worldlinecancelform' action="$wc_co_url" method="POST">
+				<input type="hidden" name="worldline_cus_cancel" value="1">
+				</form>
+<p id="msg-success" class="woocommerce-info woocommerce-message">
+Please wait while we are processing your payment.
+</p>
+<p>
+    <button id="btn-worldline">Pay Now</button>
+    <button id="btn-worldline-cancel" onclick="document.worldlinecancelform.submit()">Cancel</button>
+</p>
+EOT;
+		}
+
 		function init_form_fields()
 		{
 			$this->form_fields = array(
 				'enabled' => array(
-					'title' => __('Enable/Disable', 'ingenico'),
+					'title' => __('Enable/Disable', 'worldline'),
 					'type' => 'checkbox',
-					'label' => __('Enable Ingenico Payment Module.', 'ingenico'),
+					'label' => __('Enable Worldline Payment Module.', 'worldline'),
 					'default' => 'no'
 				),
 				'title' => array(
-					'title' => __('<span style="color: #a00;">* </span>Title:', 'Ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Title:', 'worldline'),
 					'type' => 'text',
 					'id' => "title",
 					'desc_tip'    => true,
-					'placeholder' => __('Ingenico', 'woocommerce'),
-					'description' => __('Your desired title name  will be show during checkout proccess.', 'ingenico'),
-					'default' => __('Ingenico', 'ingenico')
+					'placeholder' => __('Worldline', 'woocommerce'),
+					'description' => __('Your desired title name  will be show during checkout proccess.', 'worldline'),
+					'default' => __('Worldline', 'worldline')
 				),
 				'description' => array(
-					'title' => __('<span style="color: #a00;">* </span>Description:', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Description:', 'worldline'),
 					'type' => 'textarea',
 					'desc_tip'    => true,
 					'placeholder' => __('Description', 'woocommerce'),
-					'description' => __('Ingenico Payment Gateway', 'ingenico'),
-					'default' => __('Ingenico Payment Gateway', 'ingenico')
+					'description' => __('Worldline Payment Gateway', 'worldline'),
+					'default' => __('Worldline Payment Gateway', 'worldline')
 				),
-				'ingenico_merchant_code' => array(
-					'title' => __('<span style="color: #a00;">* </span>Merchant Code', 'ingenico'),
+				'worldline_merchant_code' => array(
+					'title' => __('<span style="color: #a00;">* </span>Merchant Code', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => true,
 					'placeholder' => __('Merchant Code', 'woocommerce'),
 					'description' => __('Merchant Code')
 				),
-				'ingenico_SALT' => array(
-					'title' => __('<span style="color: #a00;">* </span>SALT', 'ingenico'),
+				'worldline_SALT' => array(
+					'title' => __('<span style="color: #a00;">* </span>SALT', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => true,
 					'placeholder' => __('SALT', 'woocommerce'),
@@ -166,29 +188,29 @@ function woocommerce_paynimo_init()
 						'Live'          => __('LIVE', 'woocommerce'),
 					)
 				),
-				'ingenico_merchant_scheme_code' => array(
-					'title' => __('<span style="color: #a00;">* </span>Merchant Scheme Code', 'ingenico'),
+				'worldline_merchant_scheme_code' => array(
+					'title' => __('<span style="color: #a00;">* </span>Merchant Scheme Code', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => true,
 					'placeholder' => __('Merchant Scheme Code', 'woocommerce'),
 					'description' => __('Merchant Scheme Code')
 				),
-				'ingenico_success_msg' => array(
-					'title' => __('<span style="color: #a00;">* </span>Success Message', 'ingenico'),
+				'worldline_success_msg' => array(
+					'title' => __('<span style="color: #a00;">* </span>Success Message', 'worldline'),
 					'type' => 'textarea',
 					'desc_tip'    => true,
 					'default' => 'Thank you for shopping with us. Your account has been charged and your transaction is successful.',
 					'description' => __('Success Message')
 				),
-				'ingenico_decline_msg' => array(
-					'title' => __('<span style="color: #a00;">* </span>Decline Message', 'ingenico'),
+				'worldline_decline_msg' => array(
+					'title' => __('<span style="color: #a00;">* </span>Decline Message', 'worldline'),
 					'type' => 'textarea',
 					'desc_tip'    => true,
 					'default' => 'Thank you for shopping with us. However, the transaction has been declined.',
 					'description' => __('Decline Message')
 				),
 				'merchant_logo_url' => array(
-					'title' => __('<span style="color: #a00;">* </span>Merchant Logo URL', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Merchant Logo URL', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => false,
 					'placeholder' => __('Merchant logo URL', 'woocommerce'),
@@ -196,39 +218,39 @@ function woocommerce_paynimo_init()
 					'description' => __('An absolute URL pointing to a logo image of merchant which will show on checkout popup')
 				),
 				'PRIMARY_COLOR_CODE' => array(
-					'title' => __('<span style="color: #a00;">* </span>Primary Color Code', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Primary Color Code', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => false,
 					'default' => '#3977b7',
 					'description' => __('Color value can be hex, rgb or actual color name')
 				),
 				'SECONDARY_COLOR_CODE' => array(
-					'title' => __('<span style="color: #a00;">* </span>Secondary Color Code', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Secondary Color Code', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => false,
 					'default' => '#FFFFFF',
 					'description' => __('Color value can be hex, rgb or actual color name')
 				),
 				'BUTTON_COLOR_CODE_1' => array(
-					'title' => __('<span style="color: #a00;">* </span>Button Color Code 1', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Button Color Code 1', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => false,
 					'default' => '#1969bb',
 					'description' => __('Color value can be hex, rgb or actual color name')
 				),
 				'BUTTON_COLOR_CODE_2' => array(
-					'title' => __('<span style="color: #a00;">* </span>Button Color Code 2', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Button Color Code 2', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => false,
 					'default' => '#FFFFFF',
 					'description' => __('Color value can be hex, rgb or actual color name')
 				),
-				'ingenico_payment_mode' => array(
+				'worldline_payment_mode' => array(
 					'title'       => __('<span style="color: #a00;">* </span>Payment Mode', 'woocommerce'),
 					'type'        => 'select',
 					'class'    => 'chosen_select',
 					'css'      => 'min-width:350px;',
-					'description' => __('If Bank selection is at Ingenico ePayments India Pvt. Ltd. (a Worldline brand) end then select all, if bank selection at Merchant end then pass appropriate mode respective to selected option', 'woocommerce'),
+					'description' => __('If Bank selection is at worldline ePayments India Pvt. Ltd. end then select all, if bank selection at Merchant end then pass appropriate mode respective to selected option', 'woocommerce'),
 					'default'     => 'all',
 					'desc_tip'    => false,
 					'options'     => array(
@@ -283,7 +305,7 @@ function woocommerce_paynimo_init()
 					)
 				),
 				'merchantMsg' => array(
-					'title' => __('<span style="color: #a00;">* </span>Merchant Message', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Merchant Message', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => false,
 					'placeholder' => __('Merchant Message', 'woocommerce'),
@@ -291,7 +313,7 @@ function woocommerce_paynimo_init()
 				),
 
 				'disclaimerMsg' => array(
-					'title' => __('<span style="color: #a00;">* </span>Disclaimer Message', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Disclaimer Message', 'worldline'),
 					'type' => 'text',
 					'desc_tip'    => false,
 					'placeholder' => __('Disclaimer Message', 'woocommerce'),
@@ -363,7 +385,7 @@ function woocommerce_paynimo_init()
 					)
 				),
 				'payment_mode_order' => array(
-					'title' => __('<span style="color: #a00;">* </span>Payment Mode Order', 'ingenico'),
+					'title' => __('<span style="color: #a00;">* </span>Payment Mode Order', 'worldline'),
 					'type' => 'textarea',
 					'desc_tip'    => false,
 					'description' => __("Place order in this format: \r\n\r\n cards,netBanking,imps,wallets,cashCards,UPI,MVISA,debitPin,NEFTRTGS,emiBanks")
@@ -392,7 +414,7 @@ function woocommerce_paynimo_init()
 					'desc_tip'    => true,
 					'options'     => array(
 						''          					=> __('Disable', 'woocommerce'),
-						'#ingenico_payment_form'         => __('Enable', 'woocommerce'),
+						'#worldline_payment_form'         => __('Enable', 'woocommerce'),
 					)
 				),
 			);
@@ -400,9 +422,10 @@ function woocommerce_paynimo_init()
 
 		public function admin_options()
 		{
-			echo '<h3>' . __('Ingenico Payment Gateway', 'ingenico') . '</h3>';
+			echo '<h3>' . __('Worldline Payment Gateway', 'worldline') . '</h3>';
 ?>
-			<a href="#" target="_blank"><img src="<?php echo $this->icon = plugins_url('images/logo_branding_white.png', __FILE__); ?>" /></a>
+			<br>
+			<a href="#" target="_blank"><img style="width: 410px;" src="<?php echo $this->icon = plugins_url('images/worldline-mint.png', __FILE__); ?>" /></a>
 		<?php
 			echo '<table class="form-table">';
 			$this->generate_settings_html();
@@ -429,8 +452,8 @@ function woocommerce_paynimo_init()
 		{
 			global $wpdb;
 			$txnid = $order->get_transaction_id();
-			if ($order->get_payment_method() == 'ingenico') {
-				$table_name = $wpdb->prefix . 'ingenicodetails';
+			if ($order->get_payment_method() == 'worldline') {
+				$table_name = $wpdb->prefix . 'worldlinedetails';
 				$query = $wpdb->get_results("SELECT merchantid FROM " . $table_name . " WHERE orderid =" . $order->get_id());
 				$result = $query[0]->merchantid;
 				echo "<p><strong>Merchant Ref No: </strong><br>" . $result . "</p>";
@@ -451,7 +474,7 @@ function woocommerce_paynimo_init()
 			$transaction_id = $order->get_transaction_id();
 			$order_date = $order->get_date_created()->format('d-m-Y');
 			$currency = $order->get_currency();
-			$merchant_code = $this->ingenico_merchant_code;
+			$merchant_code = $this->worldline_merchant_code;
 
 			if ($this->webservice_locator == 'Test') {
 				$Amount = '1.00';
@@ -535,10 +558,10 @@ function woocommerce_paynimo_init()
 			$dir_path = plugin_dir_path(__FILE__);
 			$directoryname = 'logs';
 			$dir_name = $dir_path . 'logs/';
-			$file_name = 'Ingenico_logs' . date("Y-m-d") . '.log';
+			$file_name = 'worldline_logs' . date("Y-m-d") . '.log';
 			if (!file_exists($file_name)) {
 				$myfile = fopen($dir_name . $file_name, "a");
-				$txt =  "\r\n" . "Ingenico Response:" . $str;
+				$txt =  "\r\n" . "worldline Response:" . $str;
 				$write_file = fwrite($myfile, $txt);
 			}
 		}
@@ -548,10 +571,10 @@ function woocommerce_paynimo_init()
 			$dir_path = plugin_dir_path(__FILE__);
 			$directoryname = 'logs';
 			$dir_name = $dir_path . 'logs/';
-			$file_name = 'Ingenico_logs' . date("Y-m-d") . '.log';
+			$file_name = 'worldline_logs' . date("Y-m-d") . '.log';
 			if (!file_exists($file_name)) {
 				$myfile = fopen($dir_name . $file_name, "a");
-				$txt =  "\r\n" . "Ingenico Request:" . $str;
+				$txt =  "\r\n" . "worldline Request:" . $str;
 				$write_file = fwrite($myfile, $txt);
 			}
 		}
@@ -581,9 +604,10 @@ function woocommerce_paynimo_init()
 		{
 			global $woocommerce;
 			$msg['class']   = 'error';
-			$msg['message'] = $this->ingenico_decline_msg;
-			$identifier = $this->ingenico_merchant_code;
+			$msg['message'] = $this->worldline_decline_msg;
+			$identifier = $this->worldline_merchant_code;
 			$currency = get_woocommerce_currency();
+			$transactionCancelInProccess = false;
 			if ($_POST) {
 				$response = $_POST;
 				if (is_array($response)) {
@@ -617,13 +641,13 @@ function woocommerce_paynimo_init()
 					$transauthorised = false;
 
 					global $wpdb;
-					$table_name = $wpdb->prefix . 'ingenicodetails';
+					$table_name = $wpdb->prefix . 'worldlinedetails';
 					$query = $wpdb->query("UPDATE $table_name SET merchantid = $merchantTxnRefNumber WHERE orderid=$order_id");
 					// dual verification of the hash string
 					$hashstring = array_pop($response1);
 					$array_without_hash = $response1;
 					$string_without_hash = implode("|", $array_without_hash);
-					$salt_token = $string_without_hash . '|' . $this->ingenico_SALT;
+					$salt_token = $string_without_hash . '|' . $this->worldline_SALT;
 					$hashed_string_token = hash('sha512', $salt_token);
 
 					if ($order_id != '') {
@@ -636,7 +660,7 @@ function woocommerce_paynimo_init()
 									if ($hashed_string_token == $hashstring) {
 										if ($this->S_call($identifier, $currency, $transaction_id) == '300') {
 											$transauthorised = true;
-											$msg['message'] = $this->ingenico_success_msg . "<br>" . 'Transaction Status: ' . $error_status_msg;;
+											$msg['message'] = $this->worldline_success_msg . "<br>" . 'Transaction Status: ' . $error_status_msg;;
 											$msg['class'] = 'success';
 
 											if ($order->status != 'processing') {
@@ -648,9 +672,11 @@ function woocommerce_paynimo_init()
 								} else {
 									$msg['class'] = 'error';
 									if ($hashed_string_token != $hashstring) {
-										$msg['message'] = $this->ingenico_decline_msg . "<br>" . 'Transaction Error Message from Payment Gateway: Hash Validation Failed';
+										$transactionCancelInProccess = true;
+										$msg['message'] = $this->worldline_decline_msg . "<br>" . 'Transaction Error Message from Payment Gateway: Hash Validation Failed';
 									} else {
-										$msg['message'] = $this->ingenico_decline_msg . "<br>" . 'Transaction Status: ' . $error_status_msg;
+										$transactionCancelInProccess = true;
+										$msg['message'] = $this->worldline_decline_msg . "<br>" . 'Transaction Status: ' . $error_status_msg;
 									}
 									//300 status code error
 									$order->update_status('cancelled');
@@ -659,13 +685,14 @@ function woocommerce_paynimo_init()
 							}
 						} catch (Exception $e) {
 							$msg['class'] = 'error';
-							$msg['message'] = $this->ingenico_decline_msg . "<br>" . 'Transaction Status: ' . $error_status_msg;
+							$msg['message'] = $this->worldline_decline_msg . "<br>" . 'Transaction Status: ' . $error_status_msg;
 							$woocommerce->cart->empty_cart();
 						}
 					}
 				} else {
+					$transactionCancelInProccess = true;
 					$msg['class'] = 'error';
-					$msg['message'] = $this->ingenico_decline_msg . "<br>" . 'Error Message: Empty Response from Payment Gateway';
+					$msg['message'] = $this->worldline_decline_msg . "<br>" . 'Error Message: Empty Response from Payment Gateway';
 					$woocommerce->cart->empty_cart();
 					$order_id = $woocommerce->session->order_id;
 					$order = new WC_Order($order_id);
@@ -684,9 +711,15 @@ function woocommerce_paynimo_init()
 				$woocommerce->set_messages();
 			}
 
-			$redirect_url = get_permalink(woocommerce_get_page_id('myaccount'));
-			wp_redirect($redirect_url);
-			exit;
+			if ($transactionCancelInProccess) {
+				$redirect_url = get_permalink(woocommerce_get_page_id('myaccount'));
+				wp_redirect($redirect_url);
+				exit;
+			} else {
+				$redirect_url = $order->get_checkout_order_received_url();
+				wp_redirect($redirect_url);
+				exit;
+			}
 		}
 
 		public function generate_paynimo_form($order_id)
@@ -714,7 +747,7 @@ function woocommerce_paynimo_init()
 
 			global $wpdb;
 
-			$table_name = $wpdb->prefix . 'ingenicodetails';
+			$table_name = $wpdb->prefix . 'worldlinedetails';
 
 			$wpdb->insert(
 				$table_name,
@@ -735,12 +768,12 @@ function woocommerce_paynimo_init()
 			$customerName = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
 			$data = array();
 			$data['Amount'] = $amount;
-			$data['mrctCode'] = $this->ingenico_merchant_code;
+			$data['mrctCode'] = $this->worldline_merchant_code;
 			$data['merchantTxnRefNumber'] = $merchantTxnRefNumber;
 			$data['CustomerId'] = 'cons' . $cusid_raw;
 			$data['customerMobNumber'] = $customerMobNumber;
 			$data['email'] = $order->get_billing_email();
-			$data['SALT'] = $this->ingenico_SALT;
+			$data['SALT'] = $this->worldline_SALT;
 			if ($this->handle_response_on_popup == 'yes' &&  (int)$this->enableNewWindowFlow == 1) {
 				$data['returnUrl'] = '';
 			} else if ($this->handle_response_on_popup == 'no' && (int)$this->enableNewWindowFlow == 1) {
@@ -749,11 +782,11 @@ function woocommerce_paynimo_init()
 				$data['returnUrl'] = $this->notify_url;
 			}
 			//---------------------------Features-------------------------
-			$data['scheme'] = $this->ingenico_merchant_scheme_code;
+			$data['scheme'] = $this->worldline_merchant_scheme_code;
 			$data['currency'] = $currency_symbol;
 			$data['orderId'] = $order_id1;
 			$data['CustomerName'] = $customerName;
-			$data['ingenico_payment_mode'] = $this->ingenico_payment_mode;
+			$data['worldline_payment_mode'] = $this->worldline_payment_mode;
 			$data['enableNewWindowFlow'] = (int)$this->enableNewWindowFlow;
 			$data['enableExpressPay'] = (int)$this->enableExpressPay;
 			if ($data['enableExpressPay'] == 1) {
@@ -846,8 +879,9 @@ function woocommerce_paynimo_init()
 			$data['token'] = $hashed;
 			$checkout_url = wc_get_checkout_url();
 			$logs = $this->create_request_logs($datastring);
+			echo $this->generateOrderForm();
 		?>
-			<div id="ingenico_payment_form">
+			<div id="worldline_payment_form">
 			</div>
 			<form action="<?php echo $this->notify_url ?>" id="response-form" method="POST">
 				<input type="hidden" name="msg" value="" id="response-string">
@@ -856,6 +890,10 @@ function woocommerce_paynimo_init()
 			<script type="text/javascript" src="https://www.paynimo.com/Paynimocheckout/server/lib/checkout.js"></script>
 			<script type="text/javascript">
 				$(document).ready(function() {
+					$('#btn-worldline').trigger('click');
+				});
+
+				$('#btn-worldline').click(function() {
 					var data = <?php echo json_encode($data); ?>;
 					var configJson = {
 						'tarCall': false,
@@ -874,7 +912,7 @@ function woocommerce_paynimo_init()
 							'token': data['token'],
 							'responseHandler': handleResponse,
 							'returnUrl': data['returnUrl'],
-							'paymentMode': data['ingenico_payment_mode'],
+							'paymentMode': data['worldline_payment_mode'],
 							'checkoutElement': data['checkoutElement'],
 							'paymentModeOrder': data['paymentModeOrder'],
 							'merchantLogoUrl': data['merchantLogoUrl'],
@@ -912,7 +950,7 @@ function woocommerce_paynimo_init()
 						pnCheckoutShared.openNewWindow();
 					}
 					$(".checkout-detail-box-inner .popup-close,.confirmBox .errBtnCancel").on("click", function() {
-						window.location = data['checkout_url'];
+						// window.location = data['checkout_url'];
 					});
 
 					function handleResponse(res) {
@@ -938,7 +976,7 @@ function woocommerce_paynimo_init()
 	// Add the Gateway to WooCommerce
 	function woocommerce_add_paynimo_gateway($methods)
 	{
-		$methods[] = 'WC_Ingenico';
+		$methods[] = 'WC_worldline';
 		return $methods;
 	}
 
@@ -948,7 +986,7 @@ function woocommerce_paynimo_init()
 function my_S2S_route()
 {
 	register_rest_route(
-		'ingenico',
+		'worldline',
 		'/s2sverification',
 		array(
 			'methods' => 'POST',
@@ -962,7 +1000,7 @@ function my_S2S_route()
 function callback_S2S()
 {
 	global $woocommerce;
-	$wc_class = new WC_Ingenico();
+	$wc_class = new WC_worldline();
 
 	$response = $_GET;
 	if (!$response) {
@@ -995,13 +1033,13 @@ function callback_S2S()
 	$transauthorised = false;
 
 	global $wpdb;
-	$table_name = $wpdb->prefix . 'ingenicodetails';
+	$table_name = $wpdb->prefix . 'worldlinedetails';
 	$query = $wpdb->query("UPDATE $table_name SET merchantid = $merchantTxnRefNumber WHERE orderid=$order_id");
 	// dual verification of the hash string
 	$hashstring = array_pop($response1);
 	$array_without_hash = $response1;
 	$string_without_hash = implode("|", $array_without_hash);
-	$salt_token = $string_without_hash . '|' . $wc_class->ingenico_SALT;
+	$salt_token = $string_without_hash . '|' . $wc_class->worldline_SALT;
 	$hashed_string_token = hash('sha512', $salt_token);
 	$dir_path = plugin_dir_path(__FILE__);
 	$directoryname = 'logs';
@@ -1012,7 +1050,7 @@ function callback_S2S()
 		if ($order->status !== 'completed') {
 			if ($status == '300') {
 				if ($hashstring == $hashed_string_token) {
-					$file_name = 'Ingenico_logs' . date("Y-m-d") . '.log';
+					$file_name = 'worldline_logs' . date("Y-m-d") . '.log';
 					if (!file_exists($file_name)) {
 						$myfile = fopen($dir_name . $file_name, "a");
 						$txt =  "\r\n" . "Response_S2S:" . $str;
@@ -1025,7 +1063,7 @@ function callback_S2S()
 					return 'Hash Validation Failed';
 				}
 			} else {
-				$file_name = 'Ingenico_logs' . date("Y-m-d") . '.log';
+				$file_name = 'worldline_logs' . date("Y-m-d") . '.log';
 				if (!file_exists($file_name)) {
 					$myfile = fopen($dir_name . $file_name, "a");
 					$txt = "\r\n" . "Response_S2S:" . $str;
